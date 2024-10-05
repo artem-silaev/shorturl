@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/base64"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"sync"
 )
@@ -24,7 +24,7 @@ func createShortURLHandler(w http.ResponseWriter, r *http.Request) {
 		redirectHandler(w, r)
 	}
 
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	if err != nil || len(body) == 0 {
 		http.Error(w, "Bad request", http.StatusBadRequest)
 		return
