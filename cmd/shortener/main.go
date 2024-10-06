@@ -3,7 +3,9 @@ package main
 import (
 	"encoding/base64"
 	"fmt"
+	"github.com/go-chi/chi/v5"
 	"io"
+	"log"
 	"net/http"
 	"sync"
 )
@@ -15,14 +17,6 @@ var (
 
 func shortenURL(url string) string {
 	return base64.RawURLEncoding.EncodeToString([]byte(url))
-}
-
-func routerHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		redirectHandler(w, r)
-	}
-
-	createShortURLHandler(w, r)
 }
 
 func createShortURLHandler(w http.ResponseWriter, r *http.Request) {
@@ -61,12 +55,14 @@ func redirectHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusTemporaryRedirect)
 }
 
-func main() {
-	mux := http.NewServeMux()
-	mux.HandleFunc(`/`, routerHandler)
+func ShortUrlRouter() chi.Router {
+	r := chi.NewRouter()
 
-	err := http.ListenAndServe(`:8080`, mux)
-	if err != nil {
-		panic(err)
-	}
+	r.Post("/", createShortURLHandler)
+	r.Get("/{url}", redirectHandler)
+	return r
+}
+
+func main() {
+	log.Fatal(http.ListenAndServe(":8080", ShortUrlRouter()))
 }

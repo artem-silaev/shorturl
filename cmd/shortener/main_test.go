@@ -45,7 +45,7 @@ func Test_createShortURLHandler(t *testing.T) {
 			request := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(test.want.request))
 
 			w := httptest.NewRecorder()
-			routerHandler(w, request)
+			createShortURLHandler(w, request)
 			res := w.Result()
 			assert.Equal(t, test.want.code, res.StatusCode)
 			defer res.Body.Close()
