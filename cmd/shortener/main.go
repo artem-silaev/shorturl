@@ -27,6 +27,8 @@ func routerHandler(w http.ResponseWriter, r *http.Request) {
 
 func createShortURLHandler(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
+
+	w.Header().Set("Content-Type", "text/plain")
 	if err != nil || len(body) == 0 {
 		http.Error(w, "Bad request", http.StatusBadRequest)
 		return
@@ -40,7 +42,6 @@ func createShortURLHandler(w http.ResponseWriter, r *http.Request) {
 	shortURL := fmt.Sprintf("http://localhost:8080/%s", id)
 
 	w.WriteHeader(http.StatusCreated)
-	w.Header().Set("Content-Type", "text/plain")
 	w.Write([]byte(shortURL))
 }
 
