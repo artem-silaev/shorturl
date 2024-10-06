@@ -117,6 +117,7 @@ func Test_redirectHandler(t *testing.T) {
 			redirectHandler(w, req)
 
 			resp := w.Result()
+			defer resp.Body.Close()
 			require.Equal(t, test.want.code, resp.StatusCode)
 
 			location := resp.Header.Get("Location")
