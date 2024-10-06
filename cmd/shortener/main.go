@@ -62,7 +62,7 @@ func redirectHandler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	mux := http.NewServeMux()
-	mux.HandleFunc(`/`, createShortURLHandler)
+	mux.HandleFunc(`/`, routerHandler)
 
 	err := http.ListenAndServe(`:8080`, mux)
 	if err != nil {
