@@ -14,16 +14,18 @@ var (
 )
 
 func shortenURL(url string) string {
-	// Кодируем URL в base64 для создания уникального идентификатора
 	return base64.RawURLEncoding.EncodeToString([]byte(url))
 }
 
-func createShortURLHandler(w http.ResponseWriter, r *http.Request) {
+func routerHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		//http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		redirectHandler(w, r)
 	}
 
+	createShortURLHandler(w, r)
+}
+
+func createShortURLHandler(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil || len(body) == 0 {
 		http.Error(w, "Bad request", http.StatusBadRequest)
