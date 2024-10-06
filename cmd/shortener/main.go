@@ -31,9 +31,6 @@ func createShortURLHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	originalURL := string(body)
 
-	mu.Lock()
-	defer mu.Unlock()
-
 	id := shortenURL(originalURL)
 	urlStore[id] = originalURL
 
@@ -46,7 +43,7 @@ func createShortURLHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func redirectHandler(w http.ResponseWriter, r *http.Request) {
-	id := r.URL.Path[1:] // Убираем ведущий слэш
+	id := r.URL.Path[1:]
 
 	mu.Lock()
 	originalURL, exists := urlStore[id]
