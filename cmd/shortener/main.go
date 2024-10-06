@@ -55,7 +55,7 @@ func redirectHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusTemporaryRedirect)
 }
 
-func ShortUrlRouter() chi.Router {
+func ShortURLRouter() chi.Router {
 	r := chi.NewRouter()
 
 	r.Post("/", createShortURLHandler)
@@ -64,5 +64,5 @@ func ShortUrlRouter() chi.Router {
 }
 
 func main() {
-	log.Fatal(http.ListenAndServe(":8080", ShortUrlRouter()))
+	log.Fatal(http.ListenAndServe(":8080", ShortURLRouter()))
 }
