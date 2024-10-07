@@ -2,6 +2,7 @@ package config
 
 import (
 	"flag"
+	"os"
 )
 
 // Config хранит параметры конфигурации
@@ -16,6 +17,14 @@ func InitConfig() *Config {
 	baseURL := flag.String("b", "http://localhost:8080", "Base URL for the shortened URL")
 
 	flag.Parse()
+
+	if os.Getenv(`SERVER_ADDRESS`) != "" {
+		*address = os.Getenv(`SERVER_ADDRESS`)
+	}
+
+	if os.Getenv("BASE_URL") != "" {
+		*baseURL = os.Getenv(`BASE_URL`)
+	}
 
 	config := &Config{
 		Address: *address,
