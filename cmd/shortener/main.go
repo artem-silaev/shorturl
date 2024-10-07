@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/base64"
 	"fmt"
+	"github.com/artem-silaev/shorturl/cmd/shortener/config"
 	"github.com/go-chi/chi/v5"
 	"io"
 	"log"
@@ -12,6 +13,7 @@ import (
 
 var (
 	urlStore = make(map[string]string)
+	cfg      *config.Config
 	mu       sync.Mutex
 )
 
@@ -20,6 +22,10 @@ func shortenURL(url string) string {
 }
 
 func createShortURLHandler(w http.ResponseWriter, r *http.Request) {
+	createShortUrlAction(w, r, cfg.BaseURL)
+}
+
+func createShortUrlAction(w http.ResponseWriter, r *http.Request, baseURL string) {
 	body, err := io.ReadAll(r.Body)
 
 	w.Header().Set("Content-Type", "text/plain")
@@ -33,7 +39,7 @@ func createShortURLHandler(w http.ResponseWriter, r *http.Request) {
 	urlStore[id] = originalURL
 
 	// Формируем сокращённый URL
-	shortURL := fmt.Sprintf("http://localhost:8080/%s", id)
+	shortURL := fmt.Sprintf("%s/%s", baseURL, id)
 
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte(shortURL))
@@ -64,5 +70,6 @@ func ShortURLRouter() chi.Router {
 }
 
 func main() {
-	log.Fatal(http.ListenAndServe(":8080", ShortURLRouter()))
+	cfg = config.InitConfig()
+	log.Fatal(http.ListenAndServe(cfg.Address, ShortURLRouter()))
 }
