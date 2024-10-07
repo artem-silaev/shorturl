@@ -22,10 +22,10 @@ func shortenURL(url string) string {
 }
 
 func createShortURLHandler(w http.ResponseWriter, r *http.Request) {
-	createShortUrlAction(w, r, cfg.BaseURL)
+	createShortURLAction(w, r, cfg.BaseURL)
 }
 
-func createShortUrlAction(w http.ResponseWriter, r *http.Request, baseURL string) {
+func createShortURLAction(w http.ResponseWriter, r *http.Request, baseURL string) {
 	body, err := io.ReadAll(r.Body)
 
 	w.Header().Set("Content-Type", "text/plain")
