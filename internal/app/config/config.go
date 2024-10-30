@@ -3,6 +3,7 @@ package config
 import (
 	"flag"
 	"os"
+	"strings"
 )
 
 // Config хранит параметры конфигурации
@@ -12,7 +13,7 @@ type Config struct {
 }
 
 // InitConfig инициализирует конфигурацию из аргументов командной строки
-func InitConfig() *Config {
+func InitConfig() Config {
 	address := flag.String("a", "localhost:8080", "Address for the HTTP server")
 	baseURL := flag.String("b", "http://localhost:8080", "Base URL for the shortened URL")
 
@@ -26,10 +27,21 @@ func InitConfig() *Config {
 		*baseURL = os.Getenv(`BASE_URL`)
 	}
 
-	config := &Config{
+	if !strings.HasSuffix(*baseURL, "/") {
+		*baseURL += "/"
+	}
+
+	config := Config{
 		Address: *address,
 		BaseURL: *baseURL,
 	}
 
 	return config
+}
+
+func DefaultConfig() Config {
+	return Config{
+		Address: `localhost:8080`,
+		BaseURL: `http://localhost:8080/`,
+	}
 }
