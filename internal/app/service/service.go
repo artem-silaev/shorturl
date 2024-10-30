@@ -21,14 +21,10 @@ func NewShortenerService() *ShortenerService {
 }
 
 func (s *ShortenerService) ShortenURL(longURL string) (string, error) {
-	var shortURL string
-
-	shortURL = s.urlGenerator.GenerateURL(longURL)
-
+	shortURL := s.urlGenerator.GenerateURL(longURL)
 	if err := s.repo.AddURL(shortURL, longURL); err != nil {
 		return "", e.ErrInternal
 	}
-
 	return shortURL, nil
 }
 
