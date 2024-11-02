@@ -219,3 +219,49 @@ func TestHandleGet(t *testing.T) {
 		})
 	}
 }
+
+func TestHandler_HandlePostJSON(t *testing.T) {
+	config := config.DefaultConfig()
+	service := service.NewShortenerService()
+	h := NewHandler(service, config)
+	type want struct {
+		status int
+		isURL  bool
+	}
+	tests := []struct {
+		name        string
+		path        string
+		body        string
+		contentType string
+		want        want
+	}{
+		{
+			name:        "test 1",
+			body:        `{"url": "https://practicum.yandex.ru"} `,
+			contentType: ContentTypeJSON,
+			want: want{
+				status: http.StatusCreated,
+			},
+		},
+	}
+
+	serverAddr := `http://localhost:8080/`
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			request := httptest.NewRequest(http.MethodPost, serverAddr+"api/shorten", strings.NewReader(tt.body))
+			request.Header.Add(ContentType, tt.contentType)
+
+			w := httptest.NewRecorder()
+			h := http.HandlerFunc(h.HandlePostJSON)
+			h(w, request)
+
+			result := w.Result()
+			_, err := io.ReadAll(result.Body)
+			require.NoError(t, err)
+			err = result.Body.Close()
+			require.NoError(t, err)
+
+			assert.Equal(t, tt.want.status, result.StatusCode)
+		})
+	}
+}

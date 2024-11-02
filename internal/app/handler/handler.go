@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"encoding/json"
 	"errors"
 	"io"
 	"net/http"
@@ -15,6 +16,7 @@ import (
 const (
 	ContentType     = "Content-Type"
 	ContentTypeText = "text/plain"
+	ContentTypeJSON = "application/json"
 )
 
 type Handler struct {
@@ -67,6 +69,30 @@ func (h *Handler) HandlePost(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set(ContentType, ContentTypeText)
 	w.WriteHeader(http.StatusCreated)
 	_, err = w.Write([]byte(h.config.BaseURL + shortURL))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func (h *Handler) HandlePostJSON(w http.ResponseWriter, r *http.Request) {
+	var req service.ShortenRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	shortURL, err := h.service.ShortenURL(req.URL)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	resp := service.ShortenResponse{Result: h.config.BaseURL + shortURL}
+
+	w.Header().Set(ContentType, ContentTypeJSON)
+	w.WriteHeader(http.StatusCreated)
+	err = json.NewEncoder(w).Encode(resp)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
