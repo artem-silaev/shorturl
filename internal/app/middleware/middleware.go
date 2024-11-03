@@ -1,7 +1,11 @@
 package middleware
 
 import (
+	"compress/gzip"
+	"compress/zlib"
+	"github.com/artem-silaev/shorturl/internal/app/errors"
 	"github.com/artem-silaev/shorturl/internal/app/logger"
+	"io"
 	"net/http"
 	"time"
 )
@@ -54,4 +58,39 @@ func WithLogging(h http.Handler) http.Handler {
 		)
 	}
 	return http.HandlerFunc(logFn)
+}
+
+func Decompress(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var reader io.ReadCloser
+		var err error
+
+		encoding := r.Header.Get("Content-Encoding")
+		switch encoding {
+		case "gzip":
+			reader, err = gzip.NewReader(r.Body)
+		case "deflate":
+			reader, err = zlib.NewReader(r.Body)
+		case "":
+			reader, err = r.Body, nil
+		}
+
+		if err != nil {
+			logger.Log.Error(err.Error())
+			http.Error(w, errors.ErrDecompress.Error(), http.StatusBadRequest)
+			return
+		}
+
+		if reader == nil {
+			logger.Log.Error("decompression not implemented")
+			http.Error(w, "decompression not implemented", http.StatusInternalServerError)
+			return
+		}
+
+		defer reader.Close()
+		r.Body = reader
+
+		next.ServeHTTP(w, r)
+
+	})
 }
