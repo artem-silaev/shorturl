@@ -13,7 +13,8 @@ import (
 func main() {
 	cfg := config.InitConfig()
 	logger.Init()
-	service := service.NewShortenerService()
+	service := service.NewShortenerService(cfg.FileStoragePath)
+	service.LoadUrls()
 	r := handler.NewRouter(service, cfg)
 	err := http.ListenAndServe(cfg.Address, r)
 	if err != nil {

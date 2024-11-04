@@ -45,3 +45,10 @@ func (ms *InMemoryURLRepository) DelURL(shortURL string) error {
 	delete(ms.values, shortURL)
 	return nil
 }
+
+func (ms *InMemoryURLRepository) GetAllURL() map[string]string {
+	ms.Lock()
+	defer ms.Unlock()
+
+	return ms.values
+}

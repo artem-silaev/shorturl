@@ -4,20 +4,28 @@ import (
 	"errors"
 	e "github.com/artem-silaev/shorturl/internal/app/errors"
 	"github.com/artem-silaev/shorturl/internal/app/repository"
+	"github.com/artem-silaev/shorturl/internal/app/storage"
 	"github.com/artem-silaev/shorturl/internal/app/urlgenerator"
+	"github.com/google/uuid"
 )
 
 type ShortenerService struct {
 	URLShortener
 	repo         repository.URLRepository
 	urlGenerator urlgenerator.URLGenerator
+	storage      *storage.Storage
 }
 
-func NewShortenerService() *ShortenerService {
+func NewShortenerService(filePath string) *ShortenerService {
 	return &ShortenerService{
 		repo:         repository.NewInMemoryURLRepository(),
 		urlGenerator: urlgenerator.NewBase64EncodeGenerator(),
+		storage:      storage.NewStorage(filePath),
 	}
+}
+
+func (s *ShortenerService) LoadUrls() {
+	s.storage.LoadURLs(s.repo)
 }
 
 func (s *ShortenerService) ShortenURL(longURL string) (string, error) {
@@ -25,6 +33,9 @@ func (s *ShortenerService) ShortenURL(longURL string) (string, error) {
 	if err := s.repo.AddURL(shortURL, longURL); err != nil {
 		return "", e.ErrInternal
 	}
+
+	s.storage.SaveURLs(storage.URL{ShortURL: shortURL, OriginalURL: longURL, UUID: uuid.NewString()})
+
 	return shortURL, nil
 }
 
