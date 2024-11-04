@@ -81,7 +81,7 @@ func TestHandle(t *testing.T) {
 
 func TestHandlePost(t *testing.T) {
 	config := config.DefaultConfig()
-	service := service.NewShortenerService()
+	service := service.NewShortenerService(config.FileStoragePath)
 	h := NewHandler(service, config)
 	type want struct {
 		status int
@@ -169,7 +169,7 @@ func TestHandlePost(t *testing.T) {
 
 func TestHandleGet(t *testing.T) {
 	config := config.DefaultConfig()
-	service := service.NewShortenerService()
+	service := service.NewShortenerService(config.FileStoragePath)
 	longURL := `https://ya.ru`
 	serverAddr := `http://localhost:8080/`
 	shortURL, _ := service.ShortenURL(longURL)
@@ -222,7 +222,7 @@ func TestHandleGet(t *testing.T) {
 
 func TestHandler_HandlePostJSON(t *testing.T) {
 	config := config.DefaultConfig()
-	service := service.NewShortenerService()
+	service := service.NewShortenerService(config.FileStoragePath)
 	h := NewHandler(service, config)
 	type want struct {
 		status int

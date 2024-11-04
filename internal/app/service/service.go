@@ -24,10 +24,6 @@ func NewShortenerService(filePath string) *ShortenerService {
 	}
 }
 
-func (s *ShortenerService) LoadUrls() {
-	s.storage.LoadURLs(s.repo)
-}
-
 func (s *ShortenerService) ShortenURL(longURL string) (string, error) {
 	shortURL := s.urlGenerator.GenerateURL(longURL)
 	if err := s.repo.AddURL(shortURL, longURL); err != nil {
