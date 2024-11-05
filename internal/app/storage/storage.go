@@ -24,24 +24,12 @@ func NewStorage(filePath string) *Storage {
 }
 
 func (s *Storage) LoadURLs(repo repository.URLRepository) error {
-	file, err := os.Open(s.filePath)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	fileInfo, err := file.Stat()
+	file, err := os.ReadFile(s.filePath)
 	if err != nil {
 		return err
 	}
 
-	data := make([]byte, fileInfo.Size())
-	_, err = file.Read(data)
-	if err != nil {
-		return err
-	}
-
-	lines := string(data)
+	lines := string(file)
 	for _, line := range strings.Split(lines, "\n") {
 		if line != "" {
 			var url URL
@@ -56,7 +44,8 @@ func (s *Storage) LoadURLs(repo repository.URLRepository) error {
 }
 
 func (s *Storage) SaveURLs(url URL) error {
-	file, err := os.OpenFile(s.filePath, os.O_RDWR|os.O_APPEND, 0644)
+	file, err := os.OpenFile(s.filePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o644)
+
 	if err != nil {
 		return err
 	}
