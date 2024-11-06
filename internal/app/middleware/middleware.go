@@ -3,11 +3,12 @@ package middleware
 import (
 	"compress/gzip"
 	"compress/zlib"
-	"github.com/artem-silaev/shorturl/internal/app/errors"
-	"github.com/artem-silaev/shorturl/internal/app/logger"
 	"io"
 	"net/http"
 	"time"
+
+	"github.com/artem-silaev/shorturl/internal/app/errors"
+	"github.com/artem-silaev/shorturl/internal/app/logger"
 )
 
 type (

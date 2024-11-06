@@ -4,11 +4,12 @@ import (
 	"compress/flate"
 	"net/http"
 
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
+
 	"github.com/artem-silaev/shorturl/internal/app/config"
 	mdlwr "github.com/artem-silaev/shorturl/internal/app/middleware"
 	"github.com/artem-silaev/shorturl/internal/app/service"
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
 )
 
 func NewRouter(service service.URLShortener, config config.Config) http.Handler {

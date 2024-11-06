@@ -1,8 +1,9 @@
 package mock
 
 import (
-	"github.com/artem-silaev/shorturl/internal/app/service"
 	"github.com/stretchr/testify/mock"
+
+	"github.com/artem-silaev/shorturl/internal/app/service"
 )
 
 type MockShortenerService struct {

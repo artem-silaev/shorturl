@@ -2,11 +2,13 @@ package service
 
 import (
 	"errors"
+
+	"github.com/google/uuid"
+
 	e "github.com/artem-silaev/shorturl/internal/app/errors"
 	"github.com/artem-silaev/shorturl/internal/app/repository"
 	"github.com/artem-silaev/shorturl/internal/app/storage"
 	"github.com/artem-silaev/shorturl/internal/app/urlgenerator"
-	"github.com/google/uuid"
 )
 
 type ShortenerService struct {
@@ -16,7 +18,7 @@ type ShortenerService struct {
 	storage      *storage.Storage
 }
 
-func NewShortenerService(filePath string) *ShortenerService {
+func NewShortenerService(filePath string) URLShortener {
 	return &ShortenerService{
 		repo:         repository.NewInMemoryURLRepository(),
 		urlGenerator: urlgenerator.NewBase64EncodeGenerator(),

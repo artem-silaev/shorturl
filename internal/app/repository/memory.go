@@ -1,8 +1,9 @@
 package repository
 
 import (
-	e "github.com/artem-silaev/shorturl/internal/app/errors"
 	"sync"
+
+	e "github.com/artem-silaev/shorturl/internal/app/errors"
 )
 
 type InMemoryURLRepository struct {
