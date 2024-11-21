@@ -22,6 +22,7 @@ func NewRouter(service service.URLShortener, config config.Config) http.Handler 
 	r.Use(mdlwr.Decompress)
 
 	r.Get("/{shortURL}", h.HandleGet)
+	r.Get("/ping", h.HandleDBPing)
 	r.Post("/", h.HandlePost)
 	r.Post("/api/shorten", h.HandlePostJSON)
 	r.NotFound(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
