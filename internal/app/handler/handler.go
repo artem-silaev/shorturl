@@ -98,3 +98,22 @@ func (h *Handler) HandlePostJSON(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+func (h *Handler) HandleDBPing(w http.ResponseWriter, _ *http.Request) {
+	db, err := utils.NewPG(h.config.DatabaseDSN)
+	if err != nil {
+		http.Error(w, "cannot open db", http.StatusInternalServerError)
+
+		return
+	}
+
+	defer db.Close()
+
+	if err := db.Ping(); err != nil {
+		http.Error(w, "db is not reachable", http.StatusInternalServerError)
+
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
