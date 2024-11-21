@@ -1,75 +1,23 @@
 package main
 
 import (
-	"encoding/base64"
-	"fmt"
-	"github.com/artem-silaev/shorturl/cmd/shortener/config"
-	"github.com/go-chi/chi/v5"
-	"io"
 	"log"
 	"net/http"
-	"sync"
+
+	"github.com/artem-silaev/shorturl/internal/app/config"
+	"github.com/artem-silaev/shorturl/internal/app/handler"
+	"github.com/artem-silaev/shorturl/internal/app/logger"
+	_ "github.com/artem-silaev/shorturl/internal/app/middleware"
+	"github.com/artem-silaev/shorturl/internal/app/service"
 )
-
-var (
-	urlStore = make(map[string]string)
-	cfg      *config.Config
-	mu       sync.Mutex
-)
-
-func shortenURL(url string) string {
-	return base64.RawURLEncoding.EncodeToString([]byte(url))
-}
-
-func createShortURLHandler(w http.ResponseWriter, r *http.Request) {
-	createShortURLAction(w, r, cfg.BaseURL)
-}
-
-func createShortURLAction(w http.ResponseWriter, r *http.Request, baseURL string) {
-	body, err := io.ReadAll(r.Body)
-
-	w.Header().Set("Content-Type", "text/plain")
-	if err != nil || len(body) == 0 {
-		http.Error(w, "Bad request", http.StatusBadRequest)
-		return
-	}
-	originalURL := string(body)
-
-	id := shortenURL(originalURL)
-	urlStore[id] = originalURL
-
-	// Формируем сокращённый URL
-	shortURL := fmt.Sprintf("%s/%s", baseURL, id)
-
-	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte(shortURL))
-}
-
-func redirectHandler(w http.ResponseWriter, r *http.Request) {
-	id := r.URL.Path[1:]
-
-	mu.Lock()
-	originalURL, exists := urlStore[id]
-	mu.Unlock()
-
-	if !exists {
-		http.Error(w, "Bad request", http.StatusBadRequest)
-		return
-	}
-
-	w.Header().Set("Location", originalURL)
-	w.WriteHeader(http.StatusTemporaryRedirect)
-}
-
-func ShortURLRouter() chi.Router {
-	r := chi.NewRouter()
-
-	r.Post("/", createShortURLHandler)
-	r.Get("/{url}", redirectHandler)
-	return r
-}
 
 func main() {
-	cfg = config.InitConfig()
-	log.Fatal(http.ListenAndServe(cfg.Address, ShortURLRouter()))
+	cfg := config.InitConfig()
+	logger.Init()
+	shortenerService := service.NewShortenerService(cfg.FileStoragePath)
+	r := handler.NewRouter(shortenerService, cfg)
+	err := http.ListenAndServe(cfg.Address, r)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
